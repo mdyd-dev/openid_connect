@@ -10,7 +10,7 @@ module OpenIDConnect
 
     def userinfo!(params = {})
       hash = resource_request do
-        get client.userinfo_uri, params
+        get client.userinfo_uri, { "access_token" => @access_token }.merge(params)
       end
       ResponseObject::UserInfo.new hash
     end
