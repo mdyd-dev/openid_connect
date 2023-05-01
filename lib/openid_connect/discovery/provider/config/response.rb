@@ -81,10 +81,13 @@ module OpenIDConnect
           end
 
           def jwks
-            @jwks ||= JSON.parse(
-              OpenIDConnect.http_client.get_content(jwks_uri)
-            ).with_indifferent_access
+            @jwks ||= OpenIDConnect.http_client.get(jwks_uri).body.with_indifferent_access
             JSON::JWK::Set.new @jwks[:keys]
+          end
+
+          def jwk(kid)
+            @jwks ||= {}
+            @jwks[kid] ||= JSON::JWK::Set::Fetcher.fetch(jwks_uri, kid: kid)
           end
 
           def public_keys

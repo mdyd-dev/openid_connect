@@ -18,6 +18,13 @@ module OpenIDConnect
       ResponseObject::UserInfo.new hash
     end
 
+    def to_mtls(attributes = {})
+      (required_attributes + optional_attributes).each do |key|
+        attributes[key] = self.send(key)
+      end
+      MTLS.new attributes
+    end
+
     private
 
     def requires_token?
@@ -28,7 +35,7 @@ module OpenIDConnect
       res = yield
       case res.status
       when 200
-        JSON.parse(res.body).with_indifferent_access
+        res.body.with_indifferent_access
       when 400
         raise BadRequest.new('API Access Faild', res)
       when 401
@@ -41,3 +48,5 @@ module OpenIDConnect
     end
   end
 end
+
+require 'openid_connect/access_token/mtls'
